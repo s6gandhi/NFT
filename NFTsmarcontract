@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract SmashIndia is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+
+    Counters.Counter private _tokenIdCounter;
+     Counters.Counter private countCounter;//for counting numbers of nft minted by 1 particular adress
+    uint256 private limiter=100;
+    uint256 private limit=10;
+    mapping (address => uint256) public mintcount; //mapping adress to uint256
+    constructor() ERC721("SmashIndia", "SG") {}
+
+    function safeMint(address to, string memory uri) public onlyOwner {
+        uint256 tokenId = _tokenIdCounter.current();
+        require(tokenId<=limiter,"Sorry Maximum of NFT'S haave been minted");
+        _tokenIdCounter.increment();
+        uint256 count;
+        mintcount[msg.sender]=count;
+         count= countCounter.current();
+        require(count<=5,"you cannot buy anymore NFT's");
+        countCounter.increment;
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
+    }
+    function addrescounter(uint256 count) public{
+        mintcount[msg.sender]=count;
+
+
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+}
